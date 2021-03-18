@@ -1,0 +1,6 @@
+h5py==2.9.0
+matplotlib==3.0.3
+numpy==1.16
+scipy
+sympy
+pytorch
