@@ -121,7 +121,7 @@ class Benchmark:
         """Train the network to find a given function"""
 
         use_cuda = torch.cuda.is_available()
-        device = torch.device("cuda:2" if use_cuda else "cpu")
+        device = torch.device("cuda" if use_cuda else "cpu")
         print("Use cuda:", use_cuda, "Device:", device)
 
         x, y = generate_data(func, N_TRAIN)

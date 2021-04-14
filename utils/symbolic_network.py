@@ -139,7 +139,8 @@ class SymbolicLayerL0(SymbolicLayer):
     def sample_u(self, shape, reuse_u=False):
         """Uniform random numbers for concrete distribution"""
         if self.eps is None or not reuse_u:
-            self.eps = torch.rand(size=shape) * (1 - 2 * self.epsilon) + self.epsilon
+            device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+            self.eps = torch.rand(size=shape).to(device) * (1 - 2 * self.epsilon) + self.epsilon
         return self.eps
 
     def sample_z(self, batch_size, sample=True):
@@ -238,11 +239,9 @@ class SymbolicNetL0(nn.Module):
         return torch.sum(torch.stack([self.hidden_layers[i].loss() for i in range(self.depth)]))
 
     def get_weights(self):
-        return self.get_hidden_weights() + [self.get_output_weight()]
+        """Return list of weight matrices"""
+        # First part is iterating over hidden weights. Then append the output weight.
+        return [self.hidden_layers[i].get_weight().cpu().detach().numpy() for i in range(self.depth)] + \
+               [self.output_weight.cpu().detach().numpy()]
 
-    def get_hidden_weights(self):
-        return [self.hidden_layers[i].get_weight() for i in range(self.depth)]
-
-    def get_output_weight(self):
-        return self.output_weight
 
